@@ -23,9 +23,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-fl92@3&-*po@!ir#@!e6iv5k9%aaslkt2dy%zbn()is!=fwe0n'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False  # Set to False for production
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']  # Update with your domain/IP for production security
 
 
 # Application definition
@@ -117,11 +117,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
-# STATIC_ROOT = os.path.join(BASE_DIR, "static")
+STATIC_URL = '/static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Directory where collectstatic will gather all static files
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-    # "/var/www/static/",
+    os.path.join(BASE_DIR, "static")  # Your source static files directory
 ]
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')  
 MEDIA_URL = '/media/'  
@@ -141,7 +140,8 @@ EMAIL_HOST_PASSWORD = 'qrvz wuce fjej clzv'  # Your email password or app passwo
 DEFAULT_FROM_EMAIL = 'noreply@lawschool.edu'  # Change to your email address
 
 # Site URL (used in email links)
-SITE_URL = 'http://localhost:8000'  # Change to your actual domain in production
+# Update this with your actual domain or IP address
+SITE_URL = 'http://51.20.68.39/'  # Change to your actual domain/IP in production
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
