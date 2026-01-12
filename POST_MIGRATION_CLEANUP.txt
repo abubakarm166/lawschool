@@ -1,0 +1,66 @@
+================================================================================
+POST-MIGRATION CLEANUP INSTRUCTIONS
+================================================================================
+
+After running the migrations, you need to clean up old incompatible Download
+records and make the user and assignment fields non-nullable again.
+
+STEP 1: DELETE OLD DOWNLOAD RECORDS
+------------------------------------
+The old Download model tracked URLs, while the new model tracks user-assignment
+relationships. Old records cannot be migrated, so delete them:
+
+Option A - Using Django shell:
+python manage.py shell
+
+Then run:
+from Law_school.models import Download
+# Delete all records where user or assignment is None (old incompatible data)
+Download.objects.filter(user__isnull=True).delete()
+Download.objects.filter(assignment__isnull=True).delete()
+exit()
+
+Option B - Using Django admin:
+- Go to /admin/
+- Navigate to Downloads
+- Delete all records manually
+
+STEP 2: MAKE FIELDS NON-NULLABLE
+---------------------------------
+After deleting old records, update the model to make user and assignment
+fields required again:
+
+1. Edit Law_school/models.py:
+   - Remove null=True, blank=True from user field
+   - Remove null=True, blank=True from assignment field
+   - Uncomment the unique_together constraint
+
+2. Run migrations:
+   python manage.py makemigrations
+   python manage.py migrate
+
+STEP 3: VERIFY
+--------------
+1. Check that no Download records have null user or assignment
+2. Verify that new downloads are created with both user and assignment
+3. Test the download functionality
+
+================================================================================
+QUICK COMMANDS (After Migration)
+================================================================================
+
+# Delete old incompatible Download records
+python manage.py shell
+>>> from Law_school.models import Download
+>>> Download.objects.filter(user__isnull=True).delete()
+>>> Download.objects.filter(assignment__isnull=True).delete()
+>>> exit()
+
+# Then update models.py to remove null=True, blank=True from user and assignment
+# Then run:
+python manage.py makemigrations
+python manage.py migrate
+
+================================================================================
+END OF POST-MIGRATION CLEANUP INSTRUCTIONS
+================================================================================

@@ -1,0 +1,255 @@
+================================================================================
+LAW SCHOOL ASSIGNMENT TRACKING SYSTEM - WORKFLOW DOCUMENTATION
+================================================================================
+
+OVERVIEW
+--------
+This system allows administrators to create assignments for students/users, 
+and track how many users download each assignment. Users must request 
+registration and be approved by an administrator before accessing assignments.
+
+SYSTEM ARCHITECTURE
+-------------------
+- Framework: Django 5.0.1
+- Database: SQLite (default Django)
+- Authentication: Django's built-in User authentication system
+- Frontend: Bootstrap 5, jQuery, SweetAlert2
+
+DATABASE MODELS
+---------------
+1. UserProfile
+   - Links to Django User model
+   - Fields: user, email, full_name, registration_requested, registration_approved
+   - Purpose: Manages user registration requests and approvals
+
+2. Assignment
+   - Fields: Assignment_Name, Date, description, created_at
+   - Purpose: Stores assignment information
+   - Methods: download_count() - Returns number of unique users who downloaded
+
+3. Download
+   - Fields: user, assignment, downloaded, downloaded_at, ip_address
+   - Purpose: Tracks which users downloaded which assignments
+   - Constraint: unique_together (user, assignment) prevents duplicate tracking
+
+WORKFLOW
+--------
+
+STEP 1: USER REGISTRATION REQUEST
+----------------------------------
+1. User visits the home page (root URL: /)
+2. Clicks "Request Registration" button
+3. Fills out registration form with:
+   - Full Name
+   - Username (must be unique)
+   - Email (must be unique)
+   - Password
+   - Confirm Password
+4. System creates a User account and UserProfile with:
+   - registration_requested = True
+   - registration_approved = False (pending approval)
+5. Email notifications are sent:
+   - User receives confirmation email that their registration request was submitted
+   - Admin receives notification email about the new registration request
+6. User receives confirmation message on screen
+7. User cannot login until approved
+
+STEP 2: ADMIN APPROVAL
+----------------------
+1. Administrator logs into Django admin panel (/admin/)
+2. Navigates to "User Profiles" section
+3. Views list of pending registration requests
+4. Can approve/reject registrations by:
+   - Selecting users
+   - Using "Approve selected registration requests" action
+   - OR manually editing and checking "Registration approved" checkbox
+5. Once approved, user can login
+
+STEP 3: USER LOGIN
+------------------
+1. User visits home page and clicks "Login"
+2. Enters username and password
+3. System checks:
+   - Credentials are valid
+   - User profile exists
+   - Registration is approved
+4. If approved, user is redirected to assignments list
+5. If not approved, user sees pending approval message
+
+STEP 4: ADMIN CREATES ASSIGNMENT
+---------------------------------
+1. Administrator logs into Django admin panel (/admin/)
+2. Navigates to "Assignments" section
+3. Clicks "Add Assignment"
+4. Fills in:
+   - Assignment Name
+   - Date (deadline)
+   - Description (optional)
+5. Saves assignment
+6. Email notification is automatically sent to ALL approved users
+7. Assignment becomes visible to all approved users on the assignments page
+
+STEP 5: USER VIEWS ASSIGNMENTS
+-------------------------------
+1. Logged-in approved user is redirected to assignments list (/assignments/)
+2. Sees list of all available assignments with:
+   - Assignment Name
+   - Date/Deadline
+   - Description (if provided)
+   - Download button
+3. User can logout from this page
+
+STEP 6: USER DOWNLOADS ASSIGNMENT
+----------------------------------
+1. User clicks "Download Assignment" button
+2. System records download:
+   - Creates/updates Download record
+   - Links user to assignment
+   - Records timestamp
+   - Records IP address
+3. User sees success message (SweetAlert)
+4. Download is tracked in database
+
+STEP 7: ADMIN VIEWS DOWNLOAD STATISTICS
+----------------------------------------
+1. Administrator logs into Django admin panel (/admin/)
+2. Navigates to "Assignments" section
+3. Views list of assignments with "Downloads" column showing:
+   - Number of unique users who downloaded each assignment
+4. Can click on assignment to see details
+5. Can navigate to "Downloads" section to see:
+   - List of all downloads
+   - Which user downloaded which assignment
+   - When they downloaded it
+   - IP addresses
+
+URL STRUCTURE
+-------------
+/                          - Home page (landing page with register/login links)
+/register-request/         - Registration request form
+/login/                    - User login page
+/logout/                   - User logout
+/assignments/              - Assignments list (requires login & approval)
+/download-assignment/<id>/ - Download tracking endpoint (POST only, requires login)
+/admin/                    - Django admin panel
+
+TEMPLATES
+---------
+- index.html              - Home/landing page
+- register_request.html   - Registration request form
+- login.html              - Login form
+- pending_approval.html   - Message shown when registration pending
+- assignments_list.html   - List of assignments for logged-in users
+
+ADMIN FEATURES
+--------------
+1. UserProfile Management:
+   - View all user profiles
+   - Filter by approval status
+   - Search by name, email, username
+   - Bulk approve/reject actions
+   - Individual edit with approval checkbox
+
+2. Assignment Management:
+   - Create, edit, delete assignments
+   - View download count for each assignment
+   - Filter by creation date
+   - Search by name or description
+
+3. Download Tracking:
+   - View all download records
+   - See which users downloaded which assignments
+   - View timestamps and IP addresses
+   - Filter by assignment or date
+   - Search by username or assignment name
+
+SETUP INSTRUCTIONS
+------------------
+1. Install dependencies:
+   pip install -r requirements.txt
+
+2. Run migrations:
+   python manage.py makemigrations
+   python manage.py migrate
+
+3. Create superuser (admin account):
+   python manage.py createsuperuser
+   IMPORTANT: Make sure to provide an email address for the admin account
+   so that admin can receive registration request notifications.
+
+4. Configure email settings (in school/settings.py):
+   - For DEVELOPMENT: Email backend is set to console (emails print to terminal)
+   - For PRODUCTION: Update EMAIL_BACKEND, EMAIL_HOST, EMAIL_PORT, 
+     EMAIL_HOST_USER, EMAIL_HOST_PASSWORD, DEFAULT_FROM_EMAIL, and SITE_URL
+
+5. Run development server:
+   python manage.py runserver
+
+6. Access admin panel:
+   http://localhost:8000/admin/
+   Login with superuser credentials
+
+7. Access application:
+   http://localhost:8000/
+
+SECURITY FEATURES
+-----------------
+- CSRF protection on all forms
+- Password hashing (Django default)
+- Authentication required for protected views
+- Registration approval required before access
+- IP address tracking for downloads
+- Unique constraint prevents duplicate download tracking
+
+IMPORTANT NOTES
+---------------
+- All users start with pending approval status
+- Only approved users can access assignments
+- Download tracking records each download attempt
+- Admin can see total unique users who downloaded each assignment
+- System uses single shared URL (no unique paths per user)
+- All users access same assignments page
+- Downloads are tracked per user per assignment (unique constraint)
+- Email notifications are sent for:
+  * Registration request submission (to user and admin)
+  * New assignment creation (to all approved users)
+- In development mode, emails are printed to console
+- In production, configure SMTP settings in settings.py
+- Admin must have an email address to receive registration notifications
+
+CHANGES FROM PREVIOUS VERSION
+------------------------------
+- REMOVED: Unique URL paths (/1, /2, /3, etc.)
+- ADDED: User registration request system
+- ADDED: Admin approval workflow
+- ADDED: User authentication system
+- ADDED: Assignment management
+- ADDED: Download statistics in admin
+- ADDED: Single shared URL for all users
+- MODIFIED: Download tracking now links to User and Assignment models
+- IMPROVED: Better admin interface with statistics
+
+TROUBLESHOOTING
+---------------
+1. User cannot login after registration:
+   - Check if admin approved the registration in admin panel
+   - Verify UserProfile exists for the user
+
+2. Download not recording:
+   - Check if user is logged in
+   - Verify user's registration is approved
+   - Check browser console for JavaScript errors
+
+3. Admin cannot see download counts:
+   - Ensure migrations are run
+   - Check that downloads exist in database
+   - Verify assignment model has download_count() method
+
+4. Registration request fails:
+   - Check if username or email already exists
+   - Verify all required fields are filled
+   - Check for password mismatch
+
+================================================================================
+END OF DOCUMENTATION
+================================================================================

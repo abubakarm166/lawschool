@@ -1,0 +1,147 @@
+================================================================================
+EMAIL NOTIFICATIONS SYSTEM - DOCUMENTATION
+================================================================================
+
+This document describes the email notification system added to the Law School
+assignment tracking system.
+
+EMAIL NOTIFICATIONS
+-------------------
+The system now sends email notifications for the following events:
+
+1. REGISTRATION REQUEST SUBMISSION
+   - User receives: Confirmation email that registration request was submitted
+   - Admin receives: Notification email about new registration request
+
+2. NEW ASSIGNMENT CREATED
+   - All approved users receive: Notification email when admin creates a new assignment
+
+CONFIGURATION
+-------------
+Email settings are configured in school/settings.py:
+
+DEVELOPMENT MODE (Default):
+- EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+- Emails are printed to the console/terminal
+- No actual emails are sent
+- Useful for testing and development
+
+PRODUCTION MODE:
+To enable actual email sending, update settings.py:
+
+1. Change EMAIL_BACKEND:
+   EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+
+2. Configure SMTP settings:
+   EMAIL_HOST = 'smtp.gmail.com'  # or your SMTP server
+   EMAIL_PORT = 587
+   EMAIL_USE_TLS = True
+   EMAIL_HOST_USER = 'your-email@gmail.com'
+   EMAIL_HOST_PASSWORD = 'your-app-password'  # Use app password for Gmail
+   DEFAULT_FROM_EMAIL = 'noreply@lawschool.edu'
+   SITE_URL = 'https://yourdomain.com'  # Your actual domain
+
+3. For Gmail:
+   - Enable 2-factor authentication
+   - Generate an App Password (not your regular password)
+   - Use the App Password in EMAIL_HOST_PASSWORD
+
+4. For other email providers:
+   - Check their SMTP settings documentation
+   - Update EMAIL_HOST, EMAIL_PORT accordingly
+
+IMPORTANT NOTES
+---------------
+1. Admin Email Required:
+   - Admin users MUST have an email address in their User profile
+   - Otherwise, admin will not receive registration request notifications
+   - Set email when creating superuser or update in admin panel
+
+2. User Emails:
+   - Users must provide valid email addresses during registration
+   - Emails are used for notifications
+
+3. Approved Users Only:
+   - Assignment notification emails are sent ONLY to approved users
+   - Users with pending registration will NOT receive assignment emails
+
+4. Error Handling:
+   - Email failures do not break the system
+   - Errors are logged to console
+   - System continues to function even if emails fail
+
+EMAIL TEMPLATES
+---------------
+Emails are sent as plain text (not HTML templates). You can customize the
+messages in Law_school/utils.py:
+
+1. send_registration_request_email_to_user() - User confirmation
+2. send_registration_request_email_to_admin() - Admin notification
+3. send_assignment_notification_email() - Assignment notification
+
+FILES MODIFIED
+--------------
+1. school/settings.py
+   - Added email configuration settings
+
+2. Law_school/utils.py (NEW)
+   - Email utility functions
+   - get_admin_emails()
+   - send_registration_request_email_to_user()
+   - send_registration_request_email_to_admin()
+   - send_assignment_notification_email()
+
+3. Law_school/views.py
+   - Updated register_request() to send emails
+
+4. Law_school/models.py
+   - Added Django signal to send emails when assignments are created
+
+TESTING
+-------
+1. Development Mode Testing:
+   - Run: python manage.py runserver
+   - Submit a registration request
+   - Check terminal/console for email output
+   - Create an assignment in admin
+   - Check terminal for email notifications
+
+2. Production Mode Testing:
+   - Configure SMTP settings in settings.py
+   - Update EMAIL_BACKEND to smtp
+   - Test with a real email address
+   - Check inbox for emails
+
+TROUBLESHOOTING
+---------------
+1. No emails received in development:
+   - Check terminal/console output
+   - Emails are printed, not actually sent
+
+2. No emails received in production:
+   - Check SMTP settings are correct
+   - Verify email credentials
+   - Check spam folder
+   - Check server logs for errors
+   - Ensure firewall allows SMTP connections
+
+3. Admin not receiving registration emails:
+   - Ensure admin user has an email address
+   - Check User.is_staff = True
+   - Check User.is_active = True
+   - Verify email address in admin panel
+
+4. Users not receiving assignment emails:
+   - Verify users are approved (registration_approved = True)
+   - Check users have email addresses
+   - Check users are active (is_active = True)
+
+5. Email errors in console:
+   - Check SMTP configuration
+   - Verify network connectivity
+   - Check email server status
+   - Verify credentials
+
+================================================================================
+END OF EMAIL NOTIFICATIONS DOCUMENTATION
+================================================================================

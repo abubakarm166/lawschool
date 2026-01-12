@@ -1,0 +1,60 @@
+================================================================================
+LAW SCHOOL SYSTEM - FILES LIST
+================================================================================
+
+This file lists all files created, modified, or used in the system.
+
+================================================================================
+MODIFIED FILES
+================================================================================
+
+1. Law_school/models.py
+   - Added UserProfile model
+   - Modified Assignment model
+   - Redesigned Download model
+
+2. Law_school/urls.py
+   - Removed unique URL paths
+   - Added new URL patterns
+
+3. Law_school/views.py
+   - Complete rewrite with new functions
+   - Removed old index2 and main functions
+   - Added registration, login, logout, assignments views
+
+4. Law_school/admin.py
+   - Added UserProfileAdmin
+   - Modified AssignmentAdmin and DownloadAdmin
+
+5. templates/index.html
+   - Changed to landing page
+   - Removed old form code
+
+================================================================================
+NEW FILES CREATED
+================================================================================
+
+1. templates/register_request.html
+2. templates/login.html
+3. templates/pending_approval.html
+4. templates/assignments_list.html
+5. WORKFLOW.txt
+6. CHANGES_SUMMARY.txt
+7. FILES_LIST.txt
+8. EMAIL_NOTIFICATIONS.txt
+9. Law_school/utils.py (email utility functions)
+
+================================================================================
+UNCHANGED FILES (Still Used)
+================================================================================
+
+- manage.py
+- school/settings.py
+- school/urls.py
+- requirements.txt
+- static/files/css/style.css
+- Other static files and images
+
+================================================================================
+END OF FILES LIST
+================================================================================

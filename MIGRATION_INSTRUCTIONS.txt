@@ -1,0 +1,63 @@
+================================================================================
+MIGRATION INSTRUCTIONS - Download Model Redesign
+================================================================================
+
+The Download model has been completely redesigned. The old model tracked URLs,
+while the new model tracks user-assignment relationships. Since the data structures
+are incompatible, we need to delete old Download records before migrating.
+
+STEPS TO FOLLOW:
+----------------
+
+1. QUIT THE CURRENT MIGRATION (type "2" and press Enter)
+
+2. Delete old Download records (optional - only if you want to keep data):
+   Run in Django shell:
+   python manage.py shell
+   
+   Then:
+   from Law_school.models import Download
+   Download.objects.all().delete()
+   exit()
+
+3. OR: The easier approach - Since old data is incompatible, just proceed:
+   - Type "2" to quit
+   - The migration will need a default value for the assignment field
+   - Since old data can't be preserved, we'll need to handle this
+
+ALTERNATIVE APPROACH (Recommended):
+-----------------------------------
+
+Since the old Download model structure (URL tracking) is completely different
+from the new structure (user-assignment tracking), the existing data cannot
+be migrated. The cleanest solution is:
+
+1. Type "2" to quit the current migration
+2. Make the assignment field nullable temporarily
+3. Run migrations
+4. Delete old incompatible records
+5. Make assignment field non-nullable again
+
+OR SIMPLER:
+-----------
+
+Just delete the old Download table data manually and proceed with migration.
+
+================================================================================
+ALTERNATIVE: Provide a Default Value
+================================================================================
+
+If you want to proceed without deleting data first:
+1. Type "1" to provide a default
+2. You'll need an Assignment ID
+3. But old records won't make sense with assignment references anyway
+
+RECOMMENDATION:
+---------------
+Since this is a complete system redesign and old download data (URL tracking)
+cannot be meaningfully migrated to the new structure (user-assignment tracking),
+the best approach is to start fresh with the new Download table structure.
+
+================================================================================
+END OF MIGRATION INSTRUCTIONS
+================================================================================
