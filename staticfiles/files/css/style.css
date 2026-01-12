@@ -1,0 +1,68 @@
+body{
+    border-width: box-border;
+    padding: 0;
+    margin: 0;
+}
+.nav-item{
+    width:11.11% ;
+    color: white !important;
+    background-color: transparent;
+    border-left: 1px solid rgb(185, 184, 183);
+}
+.nav-item:hover{
+    width:11.11% ;
+    background-color: white;
+    /* color: black !important; */
+}
+.nav-item a{
+    color: white;
+    font-weight: 500;
+}
+.nav-item:hover a{
+  color: black;
+}
+/* .header{
+    background-image: static/;
+    background-image:url('../static/header-large.jpg');
+    background-attachment: fixed;
+    filter: blur(5px);
+} */
+.header {
+    /* Replace 'your-background-image.jpg' with the URL of your desired background image */
+    background-image: url('../static/header-large.jpg');
+    background-size: cover;
+    background-position: center;
+    position: relative;
+  }
+  
+  /* Pseudo-element for the blurred overlay */
+  .header::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    /* Apply the blur effect to the background image */
+    background-image: url('../static/header-large.jpg');
+    filter: blur(5px); /* Adjust the blur intensity as needed */
+    z-index: -1; /* Ensure it stays behind the content */
+  }
+  .nav-lin{
+    width: 100%;
+    border-bottom: 1px solid gray;
+    padding: 15px;
+    color:#399BBC ;
+    text-decoration: none;
+    
+  }
+  .nav-lin:first-child{
+    width: 100%;
+    font-size: 16px;
+    font-weight: 500;
+    border-bottom: 1px solid gray;
+    padding: 15px;
+    color:#399BBC ;
+    text-decoration: none;
+    
+  }
